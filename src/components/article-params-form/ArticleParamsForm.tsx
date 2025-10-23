@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import clsx from 'clsx';
 
 import { ArrowButton } from 'src/ui/arrow-button';
@@ -6,6 +7,7 @@ import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 import {
 	fontFamilyOptions,
@@ -35,6 +37,17 @@ export const ArticleParamsForm = ({
 	onApply,
 	onReset,
 }: Props) => {
+	const asideRef = useRef<HTMLDivElement>(null);
+
+	// 🔹 Закрытие меню при клике снаружи
+	useOutsideClickClose({
+		isOpen,
+		onChange: () => {
+			if (isOpen) onToggle();
+		},
+		rootRef: asideRef,
+	});
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		onApply();
@@ -45,16 +58,15 @@ export const ArticleParamsForm = ({
 			<ArrowButton isOpen={isOpen} onClick={onToggle} />
 
 			<aside
+				ref={asideRef}
 				className={clsx(styles.container, {
 					[styles.container_open]: isOpen,
 				})}>
 				<form className={styles.form} onSubmit={handleSubmit}>
-					{/* Заголовок как в макете */}
 					<Text as='h1' size={31} weight={800} uppercase dynamicLite>
 						Задайте параметры
 					</Text>
 
-					{/* Шрифт (Select) */}
 					<Select
 						title='Шрифт'
 						options={fontFamilyOptions}
@@ -64,7 +76,6 @@ export const ArticleParamsForm = ({
 						}
 					/>
 
-					{/* Размер шрифта (RadioGroup) */}
 					<RadioGroup
 						name='fontSize'
 						title='Размер шрифта'
@@ -75,7 +86,6 @@ export const ArticleParamsForm = ({
 						}
 					/>
 
-					{/* Цвет шрифта (Select — как в макете) */}
 					<Select
 						title='Цвет шрифта'
 						options={fontColors}
@@ -87,7 +97,6 @@ export const ArticleParamsForm = ({
 
 					<Separator />
 
-					{/* Цвет фона (Select) */}
 					<Select
 						title='Цвет фона'
 						options={backgroundColors}
@@ -97,7 +106,6 @@ export const ArticleParamsForm = ({
 						}
 					/>
 
-					{/* Ширина контента (Select) */}
 					<Select
 						title='Ширина контента'
 						options={contentWidthArr}
