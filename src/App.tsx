@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import clsx from 'clsx';
-
 import { Article } from './components/article/Article';
 import { ArticleParamsForm } from './components/article-params-form/ArticleParamsForm';
 import {
@@ -14,23 +12,8 @@ import styles from './styles/index.module.scss';
 export const App = () => {
 	const [articleState, setArticleState] =
 		useState<ArticleStateType>(defaultArticleState);
-	const [draftState, setDraftState] =
-		useState<ArticleStateType>(defaultArticleState);
-	const [isOpen, setIsOpen] = useState(false);
 
-	const toggleSidebar = () => setIsOpen((prev) => !prev);
-
-	const applySettings = () => {
-		setArticleState(draftState);
-		setIsOpen(false);
-	};
-
-	const resetSettings = () => {
-		setArticleState(defaultArticleState);
-		setDraftState(defaultArticleState);
-		setIsOpen(false);
-	};
-
+	// применяем стили при изменении articleState
 	useEffect(() => {
 		const root = document.documentElement;
 		root.style.setProperty(
@@ -47,15 +30,8 @@ export const App = () => {
 	}, [articleState]);
 
 	return (
-		<main className={clsx(styles.main)}>
-			<ArticleParamsForm
-				isOpen={isOpen}
-				onToggle={toggleSidebar}
-				draftState={draftState}
-				setDraftState={setDraftState}
-				onApply={applySettings}
-				onReset={resetSettings}
-			/>
+		<main className={styles.main}>
+			<ArticleParamsForm setArticleState={setArticleState} />
 			<Article />
 		</main>
 	);

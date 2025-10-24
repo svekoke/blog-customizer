@@ -1,6 +1,4 @@
-import { useRef } from 'react';
-import clsx from 'clsx';
-
+import { useState, useRef } from 'react';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Select } from 'src/ui/select';
@@ -16,52 +14,53 @@ import {
 	backgroundColors,
 	contentWidthArr,
 	ArticleStateType,
+	defaultArticleState,
 } from 'src/constants/articleProps';
 
 import styles from './ArticleParamsForm.module.scss';
 
 type Props = {
-	isOpen: boolean;
-	onToggle: () => void;
-	draftState: ArticleStateType;
-	setDraftState: React.Dispatch<React.SetStateAction<ArticleStateType>>;
-	onApply: () => void;
-	onReset: () => void;
+	setArticleState: React.Dispatch<React.SetStateAction<ArticleStateType>>;
 };
 
-export const ArticleParamsForm = ({
-	isOpen,
-	onToggle,
-	draftState,
-	setDraftState,
-	onApply,
-	onReset,
-}: Props) => {
+export const ArticleParamsForm = ({ setArticleState }: Props) => {
+	const [draftState, setDraftState] =
+		useState<ArticleStateType>(defaultArticleState);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 	const asideRef = useRef<HTMLDivElement>(null);
 
-	// 🔹 Закрытие меню при клике снаружи
+	// Закрытие меню при клике снаружи
 	useOutsideClickClose({
-		isOpen,
-		onChange: () => {
-			if (isOpen) onToggle();
-		},
+		isOpen: isMenuOpen,
+		onChange: () => setIsMenuOpen(false),
 		rootRef: asideRef,
 	});
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onApply();
+		setArticleState(draftState);
+		setIsMenuOpen(false);
+	};
+
+	const handleReset = () => {
+		setDraftState(defaultArticleState);
+		setArticleState(defaultArticleState);
+		setIsMenuOpen(false);
 	};
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={onToggle} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen(!isMenuOpen)}
+			/>
 
 			<aside
 				ref={asideRef}
-				className={clsx(styles.container, {
-					[styles.container_open]: isOpen,
-				})}>
+				className={`${styles.container} ${
+					isMenuOpen ? styles.container_open : ''
+				}`}>
 				<form className={styles.form} onSubmit={handleSubmit}>
 					<Text as='h1' size={31} weight={800} uppercase dynamicLite>
 						Задайте параметры
@@ -120,7 +119,7 @@ export const ArticleParamsForm = ({
 							title='Сбросить'
 							htmlType='button'
 							type='clear'
-							onClick={onReset}
+							onClick={handleReset}
 						/>
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
